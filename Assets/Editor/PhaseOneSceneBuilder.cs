@@ -9,27 +9,6 @@ public static class PhaseOneSceneBuilder
     private const string ScenePath = "Assets/Scenes/PhaseOnePrototype.unity";
     private const string TuningPath = "Assets/Settings/YoyoTuning.asset";
 
-    [InitializeOnLoadMethod]
-    private static void BuildMissingPrototypeScene()
-    {
-        if (AssetDatabase.LoadAssetAtPath<SceneAsset>(ScenePath) != null)
-            return;
-
-        EditorApplication.delayCall += TryBuildMissingPrototypeScene;
-    }
-
-    private static void TryBuildMissingPrototypeScene()
-    {
-        if (EditorApplication.isPlayingOrWillChangePlaymode)
-        {
-            EditorApplication.delayCall += TryBuildMissingPrototypeScene;
-            return;
-        }
-
-        if (AssetDatabase.LoadAssetAtPath<SceneAsset>(ScenePath) == null)
-            Build();
-    }
-
     [MenuItem("Yooooooooo/Build Phase One Prototype Scene")]
     public static void Build()
     {
@@ -73,16 +52,29 @@ public static class PhaseOneSceneBuilder
         PrototypeReset reset = player.AddComponent<PrototypeReset>();
 
         GameObject projectileObject = new GameObject("Yoyo Projectile");
-        SpriteRenderer projectileRenderer = projectileObject.AddComponent<SpriteRenderer>();
+        GameObject projectileVisual = new GameObject("Visual");
+        projectileVisual.transform.SetParent(projectileObject.transform, false);
+        SpriteRenderer projectileRenderer = projectileVisual.AddComponent<SpriteRenderer>();
         projectileRenderer.sprite = BuiltinSprite();
         projectileRenderer.color = new Color(1f, 0.3f, 0.2f);
         projectileRenderer.drawMode = SpriteDrawMode.Sliced;
         projectileRenderer.size = Vector2.one * 0.45f;
+
+        GameObject spinMarker = new GameObject("Spin Marker");
+        spinMarker.transform.SetParent(projectileVisual.transform, false);
+        spinMarker.transform.localPosition = new Vector3(0f, 0f, -0.01f);
+        SpriteRenderer markerRenderer = spinMarker.AddComponent<SpriteRenderer>();
+        markerRenderer.sprite = BuiltinSprite();
+        markerRenderer.color = new Color(1f, 0.9f, 0.35f);
+        markerRenderer.drawMode = SpriteDrawMode.Sliced;
+        markerRenderer.size = new Vector2(0.32f, 0.06f);
+        markerRenderer.sortingOrder = 1;
         Rigidbody2D projectileBody = projectileObject.AddComponent<Rigidbody2D>();
         projectileBody.gravityScale = 0f;
         CircleCollider2D projectileCollider = projectileObject.AddComponent<CircleCollider2D>();
         projectileCollider.radius = 0.225f;
         YoyoProjectile projectile = projectileObject.AddComponent<YoyoProjectile>();
+        Set(projectile, "visual", projectileVisual.transform);
 
         GameObject ropeObject = new GameObject("Rope");
         LineRenderer rope = ropeObject.AddComponent<LineRenderer>();

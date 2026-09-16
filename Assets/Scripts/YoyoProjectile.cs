@@ -7,6 +7,10 @@ public sealed class YoyoProjectile : MonoBehaviour
     private Rigidbody2D body;
     private Collider2D projectileCollider;
     private float worldRadius;
+    private float visualSpinSpeed;
+    private bool isDeployed;
+
+    [SerializeField] private Transform visual;
     private float launchedAt;
     private float maximumFlightTime;
     private Action<Vector2> hitCallback;
@@ -25,7 +29,7 @@ public sealed class YoyoProjectile : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    public void Launch(Vector2 origin, Vector2 velocity, float flightTime,
+    public void Launch(Vector2 origin, Vector2 velocity, float flightTime, float spinSpeed,
         Action<Vector2> onHit, Action onTimeout)
     {
         transform.position = origin;
@@ -35,9 +39,11 @@ public sealed class YoyoProjectile : MonoBehaviour
         body.velocity = velocity;
         launchedAt = Time.unscaledTime;
         maximumFlightTime = flightTime;
+        visualSpinSpeed = spinSpeed;
         hitCallback = onHit;
         timeoutCallback = onTimeout;
         IsFlying = true;
+        isDeployed = true;
     }
 
     public void StopAt(Vector2 point)
@@ -51,12 +57,16 @@ public sealed class YoyoProjectile : MonoBehaviour
     public void Hide()
     {
         IsFlying = false;
+        isDeployed = false;
         body.velocity = Vector2.zero;
         gameObject.SetActive(false);
     }
 
     private void Update()
     {
+        if (isDeployed && visual != null)
+            visual.Rotate(0f, 0f, -visualSpinSpeed * Time.deltaTime);
+
         if (IsFlying && Time.unscaledTime - launchedAt >= maximumFlightTime)
             timeoutCallback?.Invoke();
     }

@@ -21,5 +21,7 @@ MonoBehaviour:
   maximumThrowSpeed: 36
   chargeDuration: 1.1
   maximumFlightTime: 2.5
+  yoyoVisualSpinSpeed: 1080
   bulletTimeScale: 0.2
   ropeCollidesWithConnectedBody: 0
+  orbitDriveAcceleration: 36

@@ -15,10 +15,12 @@ public sealed class YoyoTuning : ScriptableObject
     public float maximumThrowSpeed = 36f;
     public float chargeDuration = 1.1f;
     public float maximumFlightTime = 2.5f;
+    public float yoyoVisualSpinSpeed = 1080f;
 
     [Header("Bullet Time")]
     [Range(0.05f, 1f)] public float bulletTimeScale = 0.2f;
 
     [Header("Rope")]
     public bool ropeCollidesWithConnectedBody;
+    public float orbitDriveAcceleration = 36f;
 }

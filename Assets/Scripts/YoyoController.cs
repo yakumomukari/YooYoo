@@ -81,7 +81,7 @@ public sealed class YoyoController : MonoBehaviour
         bulletTime.SetAiming(false);
         float speed = Mathf.Lerp(tuning.minimumThrowSpeed, tuning.maximumThrowSpeed, Charge01);
         projectile.Launch(GetLaunchPosition(), AimDirection * speed,
-            tuning.maximumFlightTime, OnProjectileHit, Recall);
+            tuning.maximumFlightTime, tuning.yoyoVisualSpinSpeed, OnProjectileHit, Recall);
         State = YoyoState.Flying;
     }
 
@@ -102,7 +102,29 @@ public sealed class YoyoController : MonoBehaviour
         ropeJoint.connectedAnchor = point;
         ropeJoint.distance = Vector2.Distance(player.Body.position, point);
         ropeJoint.enabled = true;
+        player.YoyoOrbitActive = true;
         State = YoyoState.Anchored;
+    }
+
+    private void FixedUpdate()
+    {
+        if (State != YoyoState.Anchored)
+            return;
+
+        float orbitInput = Input.GetAxisRaw("Horizontal");
+        if (Mathf.Abs(orbitInput) < 0.01f)
+            return;
+
+        Vector2 radial = player.Body.position - AnchorPoint;
+        if (radial.sqrMagnitude < 0.0001f)
+            return;
+
+        // D drives clockwise, A drives counter-clockwise. Force is purely
+        // tangential, so it builds angular speed without changing rope length.
+        Vector2 clockwiseTangent = new Vector2(radial.y, -radial.x).normalized;
+        Vector2 force = clockwiseTangent *
+            (orbitInput * tuning.orbitDriveAcceleration * player.Body.mass);
+        player.Body.AddForce(force, ForceMode2D.Force);
     }
 
     public void Recall()
@@ -118,6 +140,7 @@ public sealed class YoyoController : MonoBehaviour
     {
         // Disabling the joint does not overwrite the player's current velocity.
         ropeJoint.enabled = false;
+        player.YoyoOrbitActive = false;
         projectile.Hide();
     }
 
