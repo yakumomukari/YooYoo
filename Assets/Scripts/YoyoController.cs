@@ -13,6 +13,7 @@ public sealed class YoyoController : MonoBehaviour
     [SerializeField] private LineRenderer ropeLine;
 
     private DistanceJoint2D ropeJoint;
+    private Collider2D playerCollider;
     private Camera mainCamera;
     private float chargeStartedAt;
 
@@ -25,13 +26,13 @@ public sealed class YoyoController : MonoBehaviour
     private void Awake()
     {
         ropeJoint = GetComponent<DistanceJoint2D>();
+        playerCollider = player.GetComponent<Collider2D>();
         ropeJoint.enabled = false;
         ropeJoint.autoConfigureConnectedAnchor = false;
         ropeJoint.maxDistanceOnly = true;
         ropeJoint.enableCollision = tuning.ropeCollidesWithConnectedBody;
         mainCamera = Camera.main;
-        Physics2D.IgnoreCollision(player.GetComponent<Collider2D>(),
-            projectile.GetComponent<Collider2D>());
+        Physics2D.IgnoreCollision(playerCollider, projectile.GetComponent<Collider2D>());
     }
 
     private void Update()
@@ -77,9 +78,19 @@ public sealed class YoyoController : MonoBehaviour
     {
         bulletTime.SetAiming(false);
         float speed = Mathf.Lerp(tuning.minimumThrowSpeed, tuning.maximumThrowSpeed, Charge01);
-        projectile.Launch(launchOrigin.position, AimDirection * speed,
+        projectile.Launch(GetLaunchPosition(), AimDirection * speed,
             tuning.maximumFlightTime, OnProjectileHit, Recall);
         State = YoyoState.Flying;
+    }
+
+    private Vector2 GetLaunchPosition()
+    {
+        Bounds bounds = playerCollider.bounds;
+        Vector2 extents = bounds.extents;
+        float playerEdgeDistance = Mathf.Abs(AimDirection.x) * extents.x +
+                                   Mathf.Abs(AimDirection.y) * extents.y;
+        return (Vector2)bounds.center + AimDirection *
+            (playerEdgeDistance + projectile.WorldRadius + 0.01f);
     }
 
     private void OnProjectileHit(Vector2 point)

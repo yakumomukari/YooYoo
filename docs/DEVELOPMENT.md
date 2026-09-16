@@ -54,6 +54,8 @@
 ## 构建器修复记录
 
 - 2026-09-16：首次在 Unity Editor 内执行场景构建时，`Arial.ttf` 在 Unity 2022.3 中已不再是有效内置字体，导致构建在 HUD 引用绑定前中断。已改用 `LegacyRuntime.ttf`，并让 `PrototypeHUD` 在引用不完整时禁用自身并输出一次明确错误，避免每帧刷 `NullReferenceException`。
+- 2026-09-16：修复灰盒使用内置 UI Sprite 时通过 Transform 缩放造成的视觉/碰撞尺寸不一致。现在 SpriteRenderer 使用显式 `size`，Collider 使用完全相同的尺寸，避免悠悠球撞到看不见的大型碰撞区域。
+- 2026-09-16：悠悠球原先以玩家 Transform 中心作为弹体中心，视觉上会出现在角色身体内部。现改为沿瞄准方向从玩家 Collider 外缘加悠悠球半径的位置生成；仍属于从角色位置发射，不增加吸附、距离限制或额外冲量。
 
 ## 手感修改记录
 

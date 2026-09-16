@@ -58,11 +58,13 @@ public static class PhaseOneSceneBuilder
         SpriteRenderer playerRenderer = player.AddComponent<SpriteRenderer>();
         playerRenderer.sprite = BuiltinSprite();
         playerRenderer.color = new Color(0.2f, 0.75f, 1f);
-        player.transform.localScale = new Vector3(0.9f, 1.4f, 1f);
+        playerRenderer.drawMode = SpriteDrawMode.Sliced;
+        playerRenderer.size = new Vector2(0.9f, 1.4f);
         Rigidbody2D playerBody = player.AddComponent<Rigidbody2D>();
         playerBody.freezeRotation = true;
         playerBody.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
-        player.AddComponent<CapsuleCollider2D>();
+        CapsuleCollider2D playerCollider = player.AddComponent<CapsuleCollider2D>();
+        playerCollider.size = new Vector2(0.9f, 1.4f);
         PlayerMovement movement = player.AddComponent<PlayerMovement>();
         BulletTimeController bulletTime = player.AddComponent<BulletTimeController>();
         DistanceJoint2D joint = player.AddComponent<DistanceJoint2D>();
@@ -74,11 +76,12 @@ public static class PhaseOneSceneBuilder
         SpriteRenderer projectileRenderer = projectileObject.AddComponent<SpriteRenderer>();
         projectileRenderer.sprite = BuiltinSprite();
         projectileRenderer.color = new Color(1f, 0.3f, 0.2f);
-        projectileObject.transform.localScale = Vector3.one * 0.45f;
+        projectileRenderer.drawMode = SpriteDrawMode.Sliced;
+        projectileRenderer.size = Vector2.one * 0.45f;
         Rigidbody2D projectileBody = projectileObject.AddComponent<Rigidbody2D>();
         projectileBody.gravityScale = 0f;
         CircleCollider2D projectileCollider = projectileObject.AddComponent<CircleCollider2D>();
-        projectileCollider.radius = 0.5f;
+        projectileCollider.radius = 0.225f;
         YoyoProjectile projectile = projectileObject.AddComponent<YoyoProjectile>();
 
         GameObject ropeObject = new GameObject("Rope");
@@ -133,11 +136,13 @@ public static class PhaseOneSceneBuilder
         GameObject block = new GameObject(name);
         block.transform.SetParent(parent);
         block.transform.position = position;
-        block.transform.localScale = size;
         SpriteRenderer renderer = block.AddComponent<SpriteRenderer>();
         renderer.sprite = BuiltinSprite();
         renderer.color = new Color(0.38f, 0.42f, 0.48f);
-        block.AddComponent<BoxCollider2D>();
+        renderer.drawMode = SpriteDrawMode.Sliced;
+        renderer.size = size;
+        BoxCollider2D collider = block.AddComponent<BoxCollider2D>();
+        collider.size = size;
     }
 
     private static Sprite BuiltinSprite()

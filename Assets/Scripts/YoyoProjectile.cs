@@ -5,16 +5,22 @@ using UnityEngine;
 public sealed class YoyoProjectile : MonoBehaviour
 {
     private Rigidbody2D body;
+    private Collider2D projectileCollider;
+    private float worldRadius;
     private float launchedAt;
     private float maximumFlightTime;
     private Action<Vector2> hitCallback;
     private Action timeoutCallback;
 
     public bool IsFlying { get; private set; }
+    public float WorldRadius => worldRadius;
 
     private void Awake()
     {
         body = GetComponent<Rigidbody2D>();
+        projectileCollider = GetComponent<Collider2D>();
+        worldRadius = Mathf.Max(projectileCollider.bounds.extents.x,
+            projectileCollider.bounds.extents.y);
         body.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
         gameObject.SetActive(false);
     }
