@@ -32,10 +32,22 @@ public sealed class PlayerMovement : MonoBehaviour
         Vector2 size = new Vector2(bounds.size.x * 0.8f, tuning.groundCheckDistance);
         IsGrounded = Physics2D.OverlapBox(origin, size, 0f, groundMask) != null;
 
-        float targetX = horizontalInput * tuning.groundMoveSpeed;
-        float control = IsGrounded ? 1f : tuning.airControl;
-        float newX = Mathf.MoveTowards(body.velocity.x, targetX,
-            tuning.groundAcceleration * control * Time.fixedDeltaTime);
-        body.velocity = new Vector2(newX, body.velocity.y);
+        if (IsGrounded)
+        {
+            float targetX = horizontalInput * tuning.groundMoveSpeed;
+            float newX = Mathf.MoveTowards(body.velocity.x, targetX,
+                tuning.groundAcceleration * Time.fixedDeltaTime);
+            body.velocity = new Vector2(newX, body.velocity.y);
+            return;
+        }
+
+        // Air control adds acceleration without braking or clamping existing
+        // momentum, so tangential speed can survive and build during an orbit.
+        if (Mathf.Abs(horizontalInput) > 0.01f)
+        {
+            Vector2 force = Vector2.right *
+                (horizontalInput * tuning.groundAcceleration * tuning.airControl * body.mass);
+            body.AddForce(force, ForceMode2D.Force);
+        }
     }
 }

@@ -4,9 +4,9 @@ using UnityEngine;
 public sealed class YoyoTuning : ScriptableObject
 {
     [Header("Player")]
-    public float groundMoveSpeed = 8f;
-    public float groundAcceleration = 55f;
-    [Range(0f, 1f)] public float airControl = 0.45f;
+    public float groundMoveSpeed = 12f;
+    public float groundAcceleration = 70f;
+    [Range(0f, 1f)] public float airControl = 0.65f;
     public float gravityScale = 3f;
     public float groundCheckDistance = 0.08f;
 

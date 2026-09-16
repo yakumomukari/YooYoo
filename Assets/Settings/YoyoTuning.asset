@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a09a0f9a43b40d478d6e5ceb7bfe875, type: 3}
   m_Name: YoyoTuning
   m_EditorClassIdentifier: 
-  groundMoveSpeed: 8
-  groundAcceleration: 55
-  airControl: 0.45
+  groundMoveSpeed: 12
+  groundAcceleration: 70
+  airControl: 0.65
   gravityScale: 3
   groundCheckDistance: 0.08
   minimumThrowSpeed: 12
