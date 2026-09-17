@@ -12,19 +12,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a09a0f9a43b40d478d6e5ceb7bfe875, type: 3}
   m_Name: YoyoTuning
   m_EditorClassIdentifier: 
+  automaticallySyncCodeDefaults: 1
   groundMoveSpeed: 12
-  groundAcceleration: 70
-  airControl: 0.65
-  gravityScale: 3
+  groundAcceleration: 40
+  airControl: 0.3
+  gravityScale: 1
   groundCheckDistance: 0.08
   minimumThrowSpeed: 12
   maximumThrowSpeed: 36
   chargeDuration: 1.1
-  maximumFlightTime: 2.5
+  maximumFlightTime: 1
   yoyoVisualSpinSpeed: 1080
   bulletTimeScale: 0.2
   ropeCollidesWithConnectedBody: 1
   enableAngularAccelerationExperiment: 1
-  angularAcceleration: 4
-  maximumAngularSpeed: 8
+  angularAcceleration: 1.2
+  maximumAngularSpeed: 4
   minimumTangentialSpeed: 0.1

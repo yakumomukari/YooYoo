@@ -18,6 +18,9 @@ public sealed class PlayerMovement : MonoBehaviour
     {
         body = GetComponent<Rigidbody2D>();
         bodyCollider = GetComponent<Collider2D>();
+        // Scene serialization may preserve an older all-layers mask. Never let
+        // the feet probe classify this player's own collider as ground.
+        groundMask &= ~(1 << gameObject.layer);
         body.gravityScale = tuning.gravityScale;
     }
 
@@ -42,13 +45,16 @@ public sealed class PlayerMovement : MonoBehaviour
             return;
         }
 
-        // Air control adds acceleration without braking or clamping existing
-        // momentum, so tangential speed can survive and build during an orbit.
+        // Air input can steer toward the normal ground-speed range, but no input
+        // leaves horizontal momentum untouched. Momentum already above that range
+        // is preserved and cannot be increased further in the same direction.
         if (!YoyoOrbitActive && Mathf.Abs(horizontalInput) > 0.01f)
         {
-            Vector2 force = Vector2.right *
-                (horizontalInput * tuning.groundAcceleration * tuning.airControl * body.mass);
-            body.AddForce(force, ForceMode2D.Force);
+            float targetX = horizontalInput * tuning.groundMoveSpeed;
+            float controlledX = Mathf.MoveTowards(body.velocity.x, targetX,
+                tuning.groundAcceleration * tuning.airControl * Time.fixedDeltaTime);
+            float velocityChange = controlledX - body.velocity.x;
+            body.AddForce(Vector2.right * (velocityChange * body.mass), ForceMode2D.Impulse);
         }
 
     }
