@@ -9,7 +9,6 @@ public sealed class PlayerMovement : MonoBehaviour
     private Rigidbody2D body;
     private Collider2D bodyCollider;
     private float horizontalInput;
-    private readonly RaycastHit2D[] orbitCastHits = new RaycastHit2D[8];
 
     public Rigidbody2D Body => body;
     public bool IsGrounded { get; private set; }
@@ -40,7 +39,6 @@ public sealed class PlayerMovement : MonoBehaviour
             float newX = Mathf.MoveTowards(body.velocity.x, targetX,
                 tuning.groundAcceleration * Time.fixedDeltaTime);
             body.velocity = new Vector2(newX, body.velocity.y);
-            PreserveOrbitCollisions();
             return;
         }
 
@@ -53,39 +51,5 @@ public sealed class PlayerMovement : MonoBehaviour
             body.AddForce(force, ForceMode2D.Force);
         }
 
-        PreserveOrbitCollisions();
-    }
-
-    private void PreserveOrbitCollisions()
-    {
-        if (!YoyoOrbitActive || body.velocity.sqrMagnitude < 0.0001f)
-            return;
-
-        Vector2 direction = body.velocity.normalized;
-        float travelDistance = body.velocity.magnitude * Time.fixedDeltaTime + 0.02f;
-        ContactFilter2D filter = new ContactFilter2D();
-        filter.SetLayerMask(groundMask);
-        filter.useTriggers = false;
-
-        int hitCount = body.Cast(direction, filter, orbitCastHits, travelDistance);
-        float nearestDistance = float.PositiveInfinity;
-        Vector2 nearestNormal = Vector2.zero;
-
-        for (int i = 0; i < hitCount; i++)
-        {
-            RaycastHit2D hit = orbitCastHits[i];
-            if (hit.collider == null || hit.distance >= nearestDistance)
-                continue;
-
-            nearestDistance = hit.distance;
-            nearestNormal = hit.normal;
-        }
-
-        if (nearestDistance == float.PositiveInfinity)
-            return;
-
-        float velocityIntoSurface = Vector2.Dot(body.velocity, nearestNormal);
-        if (velocityIntoSurface < 0f)
-            body.velocity -= nearestNormal * velocityIntoSurface;
     }
 }
