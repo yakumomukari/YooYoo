@@ -24,4 +24,7 @@ MonoBehaviour:
   yoyoVisualSpinSpeed: 1080
   bulletTimeScale: 0.2
   ropeCollidesWithConnectedBody: 1
-  orbitDriveAcceleration: 36
+  enableAngularAccelerationExperiment: 1
+  angularAcceleration: 4
+  maximumAngularSpeed: 8
+  minimumTangentialSpeed: 0.1

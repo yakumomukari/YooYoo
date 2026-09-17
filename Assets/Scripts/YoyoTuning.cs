@@ -22,5 +22,10 @@ public sealed class YoyoTuning : ScriptableObject
 
     [Header("Rope")]
     public bool ropeCollidesWithConnectedBody = true;
-    public float orbitDriveAcceleration = 36f;
+
+    [Header("Phase Two Angular Acceleration Experiment")]
+    public bool enableAngularAccelerationExperiment = true;
+    [Min(0f)] public float angularAcceleration = 4f;
+    [Min(0f)] public float maximumAngularSpeed = 8f;
+    [Min(0f)] public float minimumTangentialSpeed = 0.1f;
 }

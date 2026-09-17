@@ -22,6 +22,10 @@ public sealed class YoyoController : MonoBehaviour
     public float Charge01 { get; private set; }
     public Vector2 AnchorPoint { get; private set; }
     public float RopeLength => ropeJoint.distance;
+    public bool AngularAccelerationEnabled => tuning.enableAngularAccelerationExperiment;
+    public float TangentialSpeed { get; private set; }
+    public float AngularSpeed { get; private set; }
+    public int RotationDirection { get; private set; }
 
     private void Awake()
     {
@@ -109,22 +113,49 @@ public sealed class YoyoController : MonoBehaviour
     private void FixedUpdate()
     {
         if (State != YoyoState.Anchored)
+        {
+            ResetOrbitDebugValues();
             return;
-
-        float orbitInput = Input.GetAxisRaw("Horizontal");
-        if (Mathf.Abs(orbitInput) < 0.01f)
-            return;
+        }
 
         Vector2 radial = player.Body.position - AnchorPoint;
-        if (radial.sqrMagnitude < 0.0001f)
+        float radius = radial.magnitude;
+        if (radius < 0.0001f)
+        {
+            ResetOrbitDebugValues();
+            return;
+        }
+
+        Vector2 counterClockwiseTangent = new Vector2(-radial.y, radial.x) / radius;
+        TangentialSpeed = Vector2.Dot(player.Body.velocity, counterClockwiseTangent);
+        AngularSpeed = TangentialSpeed / radius;
+        RotationDirection = Mathf.Abs(TangentialSpeed) >= tuning.minimumTangentialSpeed
+            ? (TangentialSpeed > 0f ? 1 : -1)
+            : 0;
+
+        if (!tuning.enableAngularAccelerationExperiment || RotationDirection == 0)
             return;
 
-        // D drives clockwise, A drives counter-clockwise. Force is purely
-        // tangential, so it builds angular speed without changing rope length.
-        Vector2 clockwiseTangent = new Vector2(radial.y, -radial.x).normalized;
-        Vector2 force = clockwiseTangent *
-            (orbitInput * tuning.orbitDriveAcceleration * player.Body.mass);
+        float remainingAngularSpeed = tuning.maximumAngularSpeed - Mathf.Abs(AngularSpeed);
+        if (remainingAngularSpeed <= 0f)
+            return;
+
+        // Angular acceleration is converted to tangential acceleration at the
+        // current rope radius. The final physics step is reduced so the drive
+        // cannot push its own contribution beyond the configured speed cap.
+        float appliedAngularAcceleration = Mathf.Min(tuning.angularAcceleration,
+            remainingAngularSpeed / Time.fixedDeltaTime);
+        Vector2 driveDirection = counterClockwiseTangent * RotationDirection;
+        Vector2 force = driveDirection *
+            (appliedAngularAcceleration * radius * player.Body.mass);
         player.Body.AddForce(force, ForceMode2D.Force);
+    }
+
+    private void ResetOrbitDebugValues()
+    {
+        TangentialSpeed = 0f;
+        AngularSpeed = 0f;
+        RotationDirection = 0;
     }
 
     public void Recall()

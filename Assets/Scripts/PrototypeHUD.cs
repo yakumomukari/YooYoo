@@ -33,9 +33,14 @@ public sealed class PrototypeHUD : MonoBehaviour
         Vector2 velocity = player.Body.velocity;
         string anchor = yoyo.State == YoyoController.YoyoState.Anchored
             ? $"{yoyo.AnchorPoint:F2}" : "--";
+        string rotation = yoyo.RotationDirection > 0 ? "CCW" :
+            yoyo.RotationDirection < 0 ? "CW" : "--";
         debugText.text = $"Velocity: {velocity:F2}  Speed: {velocity.magnitude:F2}\n" +
             $"Yoyo: {yoyo.State}  Anchor: {anchor}\n" +
             $"Rope: {(yoyo.State == YoyoController.YoyoState.Anchored ? yoyo.RopeLength.ToString("F2") : "--")}" +
-            $"  Charge: {yoyo.Charge01:P0}  Time: {Time.timeScale:F2}";
+            $"  Charge: {yoyo.Charge01:P0}  Time: {Time.timeScale:F2}\n" +
+            $"Angular Drive: {(yoyo.AngularAccelerationEnabled ? "ON" : "OFF")}" +
+            $"  Tangential: {yoyo.TangentialSpeed:F2}  Rotation: {rotation}" +
+            $"  Angular: {yoyo.AngularSpeed:F2} rad/s";
     }
 }
