@@ -29,8 +29,8 @@ public sealed class YoyoController : MonoBehaviour
         playerCollider = player.GetComponent<Collider2D>();
         ropeJoint.enabled = false;
         ropeJoint.autoConfigureConnectedAnchor = false;
-        // The hit distance becomes a fixed orbit radius. This keeps the player on
-        // the circle around the anchor instead of behaving like a slack rope.
+        // The hit distance is the orbit radius. World collision remains enabled
+        // separately so the player still collides with terrain while constrained.
         ropeJoint.maxDistanceOnly = false;
         ropeJoint.enableCollision = tuning.ropeCollidesWithConnectedBody;
         mainCamera = Camera.main;

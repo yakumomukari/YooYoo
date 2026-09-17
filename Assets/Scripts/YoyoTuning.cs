@@ -21,6 +21,6 @@ public sealed class YoyoTuning : ScriptableObject
     [Range(0.05f, 1f)] public float bulletTimeScale = 0.2f;
 
     [Header("Rope")]
-    public bool ropeCollidesWithConnectedBody;
+    public bool ropeCollidesWithConnectedBody = true;
     public float orbitDriveAcceleration = 36f;
 }
